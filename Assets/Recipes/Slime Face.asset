@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 987b110875a137d44a87d7ffb7ad39cd, type: 3}
+  m_Name: Slime Face
+  m_EditorClassIdentifier: 
+  recipeName: Slime Face
+  RecipeSprite: {fileID: 0}
+  tier: 1
+  ingredientRecords:
+  - name: Raw
+    ingredient: {fileID: 7731461821947229565, guid: 6bc09156c429ac444bbbb4245f9318f8,
+      type: 3}
+    amount: 5
+  - name: Eye
+    ingredient: {fileID: 8105533050110190996, guid: 86a3ee9d4834ce94bb20ca811b412bf0,
+      type: 3}
+    amount: 1
+  - name: Mouth
+    ingredient: {fileID: 3685503077037235851, guid: 6d01024c2d0e9c4499f6dd3bb7135c44,
+      type: 3}
+    amount: 1
