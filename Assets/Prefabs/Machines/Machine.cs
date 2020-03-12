@@ -1,29 +1,60 @@
-﻿namespace MonsterFactory
+﻿
+
+namespace MonsterFactory
 {
-    using System.Collections.Generic;
+    using System.Collections;
     using UnityEngine;
 
     public class Machine : MonoBehaviour
     {
-        [SerializeField] Transform m_SpawnPoint;
-        private Animator[] m_Animators;
-
         [Header("Machine Setting", order = 1)]
         [Tooltip("On/Off state of the machine.")]
         [SerializeField] protected bool m_State;
         public string machineName;
-        public int costToBuild;
         public string description;
-        [SerializeField] protected float m_RuntimeCost;
-        [Tooltip("x: Current queue size / y: Queue limit")]
-        [SerializeField] protected Vector2 m_Queue;
+        public int buildCost;
+        public float electriCostPerSecond;
+        public float accumulatedElectricCost;
 
-        protected void Start()
+        private Transform m_SpawnPoint;
+        private Animator[] m_Animators;
+        private QuickOutline.Outline m_Outline;
+
+        // TODO: NEED TO FIX THIS - CELL_MACHINE REFERENCE
+        public GameObject cell;
+
+        protected virtual void Awake()
         {
             m_Animators = GetComponentsInChildren<Animator>();
-            m_SpawnPoint = transform.GetChild(1);
+            m_SpawnPoint = transform.Find("SpawnPoint");
+            m_Outline = GetComponent<QuickOutline.Outline>();
         }
-        
+
+        protected virtual void Start()
+        {
+            StartCoroutine(CR_AccumulateElectricityCost());
+        }
+
+        /// <summary>
+        /// Increase accumulatedElectricCost per 1 second based on electriCostPerSecond;
+        /// </summary>
+        /// <returns></returns>
+        IEnumerator CR_AccumulateElectricityCost()
+        {
+            while (true)
+            {
+                if (m_State)
+                {
+                    accumulatedElectricCost += electriCostPerSecond;
+                    yield return new WaitForSeconds(1);
+                }
+                yield return null;
+            }
+        }
+
+        /// <summary>
+        /// Switch on/off machine.
+        /// </summary>
         public void ToggleState()
         {
             m_State = !m_State;
@@ -39,20 +70,32 @@
                 }
             }
         }
-        
-        protected void PoolObject(string _poolTag)
+
+        public bool GetState()
         {
-            GameObject _object = PoolManager.instance.RequestAvailableObject(_poolTag);
+            return m_State;
+        }
+
+        /// <summary>
+        /// Find object from PoolManager, then "spawn" it at m_SpawnPoint;
+        /// </summary>
+        /// <param name="_poolTag">Used to find corresponding pool in Master Pool.</param>
+        /// <param name="_masterPoolTag">Used to differentiate Master Pool.</param>
+        protected void PoolObject(string _poolTag, string _masterPoolTag = "ItemPools")
+        {
+            GameObject _object = PoolManager.Instance.RequestAvailableObject(_poolTag, _masterPoolTag);
             _object.transform.position = m_SpawnPoint.position;
             _object.transform.rotation = m_SpawnPoint.rotation;
             _object.gameObject.SetActive(true);
         }
 
-        private void OnMouseOver()
+        /// <summary>
+        /// Rotate Machine with _degree
+        /// </summary>
+        /// <param name="_degree">Passed down from Machine UI.</param>
+        public void RotateMachine(int _degree)
         {
-            Debug.Log("You just hover over " + gameObject.name);
+            transform.Rotate(new Vector3(0, _degree, 0));
         }
-
-
     }
 }

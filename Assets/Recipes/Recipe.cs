@@ -8,8 +8,8 @@
     public class Recipe : ScriptableObject
     {
         public string recipeName;
-        public Sprite RecipeSprite;
+        public Sprite recipeSprite;
         public int tier;
-        public IngredientRecord[] ingredientRecords;
+        public ItemRecord[] itemRecords;
     }
 }

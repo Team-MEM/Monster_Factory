@@ -6,6 +6,11 @@ TagManager:
   tags:
   - Assembler
   - GenericMachine
+  - Limb
+  - Sensory
+  - Skin
+  - Sorter
+  - FxTemporaire
   layers:
   - Default
   - TransparentFX
@@ -23,13 +28,13 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - Tile
   - Machine
-  - 
+  - MachineIcon
   - 
   - Item
   - TransferNode
-  - 
+  - UI3D
   - 
   - 
   - 

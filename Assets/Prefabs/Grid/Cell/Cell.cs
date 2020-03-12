@@ -2,6 +2,7 @@
 {
     using System.Collections;
     using UnityEngine;
+    using UnityEngine.EventSystems;
 
     /*
      * How to make a Tower Defense Game (E06 BUILDING) - Unity Tutorial
@@ -14,7 +15,6 @@
     {
         [SerializeField] float m_DestroyTimer;
         [SerializeField] Color m_HighlighColor;
-        [SerializeField] Transform m_Arrow;
 
         [Space(10)]
         [Header("Gizmos Setting")]
@@ -24,10 +24,11 @@
         [SerializeField] float m_GizmosHeight;
         [SerializeField] float m_GizmosSize;
 
-        private GameObject m_Machine;
         private Color m_OriginalColor;
         private MeshRenderer m_MeshRenderer;
-        private Vector3 m_RotationOffset;
+
+        // TODO: RIIIIP I NEED TO FIX THIS AS WELL - CELL_MACHINE REFERENCE
+        public GameObject machine;
 
         private void Start()
         {
@@ -43,70 +44,65 @@
         {
             RaycastHit _hit;
             if (Physics.Raycast(transform.position, transform.up, out _hit, 2f, layerMask))
-                m_Machine = _hit.collider.gameObject;
-        }
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Q))
-            {
-                m_RotationOffset += new Vector3(0, -90, 0);
-                m_Arrow.Rotate(new Vector3(0,0,90));
-            }
-
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                m_RotationOffset += new Vector3(0, 90, 0);
-                m_Arrow.Rotate(new Vector3(0, 0, -90));
-            }
+                machine = _hit.collider.gameObject;
         }
         
-        private IEnumerator OnTriggerEnter(Collider other)
+        private IEnumerator OnTriggerStay(Collider other)
         {
             if (other.GetComponent<Machine>() != null)
-                m_Machine = other.gameObject;
+                machine = other.gameObject;
             else
             {
-                yield return new WaitForSeconds(m_DestroyTimer);
+                other.GetComponent<Item>().isOnFloor = true;
+                yield return new WaitForSeconds(0);
                 other.gameObject.SetActive(false);
             }
         }
-        
-        private void OnMouseEnter()
+
+
+        // TODO: OMG THIS MONSTROSITY CODE
+        private void OnMouseOver()
         {
-            m_MeshRenderer.material.color = m_HighlighColor;
-            m_Arrow.gameObject.SetActive(true);
+            if (!EventSystem.current.IsPointerOverGameObject() && BuildManager.Instance.machineToBuild.machine != null)
+            {
+                BuildManager.Instance.ShowHologram(transform.position);
+                m_MeshRenderer.material.color = m_HighlighColor;
+            }
+            else
+            {
+                m_MeshRenderer.material.color = m_OriginalColor;
+                BuildManager.Instance.ShowHologram(Vector3.zero);
+            }
+
         }
 
         private void OnMouseDown()
         {
-            if (m_Machine != null)
+            if (!MainUIManager.Instance.IsPointerOverUIObject() && BuildManager.Instance.machineToBuild.machine != null)
             {
-                Debug.Log("This tile has been taken!");
-                return;
-            }
+                if (machine != null)
+                {
+                    Debug.Log("This tile has been taken!");
+                    return;
+                }
 
-            // Build Machine
-            // TODO: Builder Error
-            GameObject _machineToBuild = BuildManager.instance.GetMachineToBuild();
-
-            if (_machineToBuild != null)
-            {
-                m_Machine = Instantiate(_machineToBuild, transform.position, transform.rotation * Quaternion.Euler(m_RotationOffset));
+                // Build Machine
+                BuildManager.Instance.BuildMachineAt(transform);
+                BuildManager.Instance.ShowHologram(Vector3.zero);
             }
         }
 
         private void OnMouseExit()
         {
             m_MeshRenderer.material.color = m_OriginalColor;
-            m_Arrow.gameObject.SetActive(false);
+            BuildManager.Instance.ShowHologram(Vector3.zero);
         }
 
         private void OnDrawGizmos()
         {
             if (m_ToggleGizmo)
             {
-                if (m_Machine == null)
+                if (machine == null)
                     Gizmos.color = m_ColorWhenFree;
                 else
                     Gizmos.color = m_ColorWhenOccupied;

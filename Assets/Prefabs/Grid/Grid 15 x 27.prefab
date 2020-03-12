@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2764461384427407916}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Grid 15 x 27
   m_TagString: Untagged
   m_Icon: {fileID: 0}

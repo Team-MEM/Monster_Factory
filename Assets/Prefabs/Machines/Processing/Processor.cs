@@ -5,40 +5,18 @@
 
     public class Processor : Machine
     {
-        #region Processor Recipe Struct - hold intake and output pair
-        [System.Serializable]
-        struct ProcessorRecipe
-        {
-            public string intake;
-            public string output;
-        }
-        #endregion
+        [SerializeField] Item m_RequiredInput;
+        [SerializeField] Item m_ProcessedOutput;
         
-        [Range(5f, 10f)]
-        [SerializeField] float m_ProcessingRate;
-        [SerializeField] ProcessorRecipe[] m_ProcessorRecipes;
-
-        IEnumerator ProcessMaterial(string _materialName)
+        private void OnTriggerEnter(Collider _other)
         {
-            yield return new WaitForSeconds(m_ProcessingRate);
-            
-            // TODO: Need to figure out a way to debug this.
-            foreach (ProcessorRecipe _recipe in m_ProcessorRecipes)
+            if (m_State)
             {
-                if (_materialName == _recipe.intake)
+                if (_other.GetComponent<Item>().name == m_RequiredInput.name)
                 {
-                    PoolObject(_recipe.output);
-                    break;
+                    _other.gameObject.SetActive(false);
+                    PoolObject(m_ProcessedOutput.name);
                 }
-            }
-        }
-
-        private void OnTriggerStay(Collider other)
-        {
-            if (other.GetComponent<Item>().id == 0)
-            {
-                other.gameObject.SetActive(false);
-                StartCoroutine(ProcessMaterial(other.gameObject.GetComponent<Item>().name));
             }
         }
     }
